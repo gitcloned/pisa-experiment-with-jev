@@ -1,0 +1,7 @@
+{
+  "id": "walking",
+  "title": "Walking",
+  "description": "The picture shows the footprints of a man walking. The pacelength P is the distance between the rears of two consecutive footprints.\n\nFor men, the formula n/P = 140 gives an approximate relationship between n and P where:\n\nn = number of steps per minute\nP = pacelength in metres",
+  "imageFile": "walking.png",
+  "imageAlt": "Footprints of a man walking, with pacelength P marked as the distance between the rears of two consecutive footprints"
+}

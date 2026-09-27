@@ -1,0 +1,16 @@
+{
+  "id": 1,
+  "stem": "If the formula applies to Heiko's walking and Heiko takes 70 steps per minute, what is Heiko's pacelength? Show your work.",
+  "correctAnswer": "0.5 metres (or 50 cm)",
+  "steps": [
+    "n/P = 140",
+    "70/P = 140",
+    "P = 70/140",
+    "P = 0.5 m"
+  ],
+  "rubric": {
+    "full": { "score": 1, "description": "Correct answer of 0.5 m or 50 cm, with or without working shown" },
+    "none": { "score": 0, "description": "Any other response" }
+  },
+  "maxScore": 1
+}
