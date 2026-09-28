@@ -21,8 +21,19 @@ export default function AnswerModal({ question, onSubmit, onClose }: Props) {
     reader.onload = (e) => {
       const dataUrl = e.target?.result as string;
       setImagePreview(dataUrl);
-      // Strip the data:image/...;base64, prefix for the API
-      setImageBase64(dataUrl.split(",")[1]);
+      // Compress: resize to max 1024px wide, JPEG at 0.75 quality
+      const img = new window.Image();
+      img.onload = () => {
+        const MAX = 1024;
+        const scale = img.width > MAX ? MAX / img.width : 1;
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const compressed = canvas.toDataURL("image/jpeg", 0.75);
+        setImageBase64(compressed.split(",")[1]);
+      };
+      img.src = dataUrl;
     };
     reader.readAsDataURL(file);
   }

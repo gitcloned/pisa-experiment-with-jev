@@ -170,8 +170,7 @@ export default function ResultsModal({ question, results, onNext, isLast }: Prop
                   const hasOcr = model === "jev" && !!r.ocrLatencyMs;
                   return (
                     <div key={model} className="flex items-center gap-2 mb-1.5 last:mb-0">
-                      <span className={`text-xs font-medium shrink-0 ${model === "jev" ? "text-purple-600" : "text-teal-600"}`}
-                        style={{ width: hasOcr ? "5.5rem" : model === "jev" ? "2.5rem" : "7rem" }}>
+                      <span className={`text-xs font-medium shrink-0 w-28 ${model === "jev" ? "text-purple-600" : "text-teal-600"}`}>
                         {model === "jev" ? (hasOcr ? "JEV + OCR" : "JEV") : "Gemini 3.8 Flash"}
                       </span>
                       <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden flex">
