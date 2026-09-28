@@ -25,14 +25,11 @@ function RatingBadge({ rating }: { rating?: string }) {
   );
 }
 
-function ProbabilityDot({ probability, earned }: { probability: number; earned: boolean }) {
+function ProbabilityDot({ earned }: { probability: number; earned: boolean }) {
   return (
-    <div className="flex items-center gap-1">
-      <span className={`font-semibold text-xs ${earned ? "text-green-600" : "text-red-400"}`}>
-        {earned ? "✓" : "✗"}
-      </span>
-      <span className="text-xs text-gray-400">{Math.round(probability * 100)}%</span>
-    </div>
+    <span className={`font-semibold text-sm ${earned ? "text-green-600" : "text-red-400"}`}>
+      {earned ? "✓" : "✗"}
+    </span>
   );
 }
 
