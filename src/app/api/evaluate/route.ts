@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
   // Flag this on the Jev result so the UI can explain the extra cost step.
   const jevValue = jevResult.status === "fulfilled" ? jevResult.value : fallback(question.maxScore, "Jev evaluation failed");
   if (imageOnly && jevValue.cost) {
-    jevValue.cost.note = "Image pipeline: needs OCR step first (extra Gemini call ~$0.001) + Jev eval";
+    jevValue.cost.note = "Cost shown is Jev-only (evaluated empty text). Real image pipeline needs OCR first (extra Gemini call ~$0.001), not included here.";
   }
 
   return NextResponse.json({

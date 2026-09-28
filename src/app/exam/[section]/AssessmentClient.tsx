@@ -80,11 +80,13 @@ export default function AssessmentClient({ section, questions }: Props) {
       </div>
 
       {/* Mobile layout */}
-      <div className="md:hidden min-h-screen flex flex-col">
+      <div className="md:hidden h-dvh flex flex-col overflow-hidden">
         {view === "stimulus" ? (
-          <div className="flex flex-col flex-1">
-            <StimulusPanel section={section} />
-            <div className="p-4 bg-white border-t border-gray-200">
+          <>
+            <div className="flex-1 overflow-y-auto">
+              <StimulusPanel section={section} />
+            </div>
+            <div className="shrink-0 p-4 bg-white border-t border-gray-200">
               <button
                 onClick={() => setView("question")}
                 className="w-full bg-blue-600 text-white rounded-xl py-3 font-semibold text-base"
@@ -92,12 +94,12 @@ export default function AssessmentClient({ section, questions }: Props) {
                 Start Questions →
               </button>
             </div>
-          </div>
+          </>
         ) : (
-          <div className="flex flex-col flex-1">
+          <>
             {/* Stimulus re-open drawer */}
             {stimulusOpen && (
-              <div className="bg-white border-b border-gray-200 p-4 max-h-64 overflow-y-auto">
+              <div className="shrink-0 bg-white border-b border-gray-200 p-4 max-h-64 overflow-y-auto">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-sm font-semibold text-gray-700">Stimulus</span>
                   <button onClick={() => setStimulusOpen(false)} className="text-gray-400 text-lg">✕</button>
@@ -105,15 +107,43 @@ export default function AssessmentClient({ section, questions }: Props) {
                 <StimulusPanel section={section} compact />
               </div>
             )}
-            <QuestionPanel
-              question={question}
-              currentIdx={currentIdx}
-              total={questions.length}
-              loading={loading}
-              onAnswer={() => setAnswerModalOpen(true)}
-              onReadStimulus={() => setStimulusOpen((v) => !v)}
-            />
-          </div>
+            <div className="flex-1 overflow-y-auto p-6">
+              {/* Progress header */}
+              <div className="flex items-center justify-between mb-6">
+                <span className="text-xs text-gray-400 font-medium">
+                  Question {currentIdx + 1} of {questions.length}
+                </span>
+                <div className="flex gap-1.5">
+                  {Array.from({ length: questions.length }).map((_, i) => (
+                    <div
+                      key={i}
+                      className={`h-1 w-5 rounded-full transition-colors ${
+                        i === currentIdx ? "bg-blue-600" : i < currentIdx ? "bg-blue-300" : "bg-gray-200"
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+              <button
+                onClick={() => setStimulusOpen((v) => !v)}
+                className="mb-4 inline-flex items-center gap-1.5 text-xs text-blue-600 border border-blue-200 bg-blue-50 rounded-full px-3 py-1 font-medium"
+              >
+                <span>📖</span> Read stimulus
+              </button>
+              <p className="text-base font-semibold text-gray-900 leading-relaxed">
+                {question.stem}
+              </p>
+            </div>
+            <div className="shrink-0 p-4 bg-white border-t border-gray-100">
+              <button
+                onClick={() => setAnswerModalOpen(true)}
+                disabled={loading}
+                className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white rounded-xl py-3.5 font-semibold text-base transition-colors"
+              >
+                {loading ? "Evaluating…" : "Answer"}
+              </button>
+            </div>
+          </>
         )}
       </div>
 
