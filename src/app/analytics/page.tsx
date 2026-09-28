@@ -60,8 +60,8 @@ export default async function AnalyticsPage() {
                         {u.visit_count}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-gray-400 text-xs">{new Date(u.first_seen).toLocaleString()}</td>
-                    <td className="px-4 py-3 text-gray-400 text-xs">{new Date(u.last_seen).toLocaleString()}</td>
+                    <td className="px-4 py-3 text-gray-400 text-xs">{new Date(u.first_seen).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}</td>
+                    <td className="px-4 py-3 text-gray-400 text-xs">{new Date(u.last_seen).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}</td>
                   </tr>
                 ))}
                 {users.length === 0 && (
