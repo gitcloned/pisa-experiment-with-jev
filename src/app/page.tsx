@@ -1,8 +1,11 @@
 import { loadAllSections, loadQuestions } from "@/lib/questions";
 import Link from "next/link";
 import Image from "next/image";
+import { auth } from "@/auth";
+import { SignInBanner, SignInModal } from "@/components/SignInGate";
 
-export default function Home() {
+export default async function Home() {
+  const session = await auth();
   const sections = loadAllSections();
   const sectionsWithCount = sections.map((s) => ({
     ...s,
@@ -11,6 +14,8 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-gray-50">
+      <SignInBanner session={session} />
+      {!session && <SignInModal />}
       {/* Hero */}
       <div className="bg-white border-b border-gray-100 px-6 py-10 text-center">
         <p className="text-xs font-semibold tracking-widest text-blue-500 uppercase mb-2">PISA Math Assessment</p>
