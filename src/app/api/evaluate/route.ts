@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
 
   const question = loadQuestion(sectionId, Number(questionId));
   const text = answerText || "";
+  const imageOnly = !!answerImage && !text;
 
   const [jevResult, geminiResult] = await Promise.allSettled([
     jevAvailable()
@@ -36,11 +37,16 @@ export async function POST(req: NextRequest) {
   if (jevResult.status === "rejected") console.error("[jev]", jevResult.reason);
   if (geminiResult.status === "rejected") console.error("[gemini]", geminiResult.reason);
 
+  // For image-only answers, Jev can't process the image directly.
+  // The pipeline would require: Gemini OCR → extracted text → Jev eval.
+  // Flag this on the Jev result so the UI can explain the extra cost step.
+  const jevValue = jevResult.status === "fulfilled" ? jevResult.value : fallback(question.maxScore, "Jev evaluation failed");
+  if (imageOnly && jevValue.cost) {
+    jevValue.cost.note = "Image pipeline: needs OCR step first (extra Gemini call ~$0.001) + Jev eval";
+  }
+
   return NextResponse.json({
-    jev:
-      jevResult.status === "fulfilled"
-        ? jevResult.value
-        : fallback(question.maxScore, "Jev evaluation failed"),
+    jev: jevValue,
     gemini:
       geminiResult.status === "fulfilled"
         ? geminiResult.value

@@ -8,9 +8,29 @@
     "P = 70/140",
     "P = 0.5 m"
   ],
-  "rubric": {
-    "full": { "score": 1, "description": "Correct answer of 0.5 m or 50 cm, with or without working shown" },
-    "none": { "score": 0, "description": "Any other response" }
-  },
-  "maxScore": 1
+  "rubric": [
+    {
+      "score": 1,
+      "description": "Correct answer of 0.5m or 50cm"
+    },
+    {
+      "score": 1,
+      "description": "Have show steps properly and used steps to solve"
+    }
+  ],
+  "rating": [
+    {
+      "level": "proficient",
+      "description": "Have answered correctly and quickly"
+    },
+    {
+      "level": "learning",
+      "description": "Steps were corrent, but final answer was incorrect, or final answer was correct despite some mistake in steps"
+    },
+    {
+      "level": "need_attention",
+      "description": "Incorrect answer and No valid method shown"
+    }
+  ],
+  "maxScore": 2
 }

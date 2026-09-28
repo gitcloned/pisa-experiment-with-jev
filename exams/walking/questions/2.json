@@ -7,10 +7,29 @@
     "Speed = n × P = 112 × 0.80 = 89.6 metres per minute",
     "Convert to km/hr: 89.6 × 60 / 1000 = 5.376 ≈ 5.38 km/hr"
   ],
-  "rubric": {
-    "full": { "score": 2, "description": "Both correct: ~89.6 m/min AND ~5.38 km/hr (rounding errors acceptable)" },
-    "partial": { "score": 1, "description": "Only one value correct, or correct method with minor arithmetic errors, or n=112 found but speed not completed" },
-    "none": { "score": 0, "description": "No valid method shown or completely wrong approach" }
-  },
+  "rubric": [
+    {
+      "score": 1,
+      "description": "Correctly calculated walking speed in metres per minute (acceptable: ~89.6 m/min or ~90 m/min)"
+    },
+    {
+      "score": 1,
+      "description": "Correctly converted to kilometres per hour (acceptable: ~5.38 km/hr or ~5.4 km/hr)"
+    }
+  ],
+  "rating": [
+    {
+      "level": "proficient",
+      "description": "Have answered correctly and quickly"
+    },
+    {
+      "level": "learning",
+      "description": "Steps were corrent, but final answer was incorrect, or final answer was correct despite some mistake in steps"
+    },
+    {
+      "level": "need_attention",
+      "description": "Incorrect answer and No valid method shown"
+    }
+  ],
   "maxScore": 2
 }

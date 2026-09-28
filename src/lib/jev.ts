@@ -1,5 +1,5 @@
 import "server-only";
-import { TypeSafeClient, noul, score } from "@typesafe-ai/sdk";
+import { TypeSafeClient, noul, choice } from "@typesafe-ai/sdk";
 import type { Question, EvalResult } from "@/types";
 
 let client: TypeSafeClient | null = null;
@@ -9,7 +9,7 @@ function getClient() {
     client = new TypeSafeClient({
       defaultModel: process.env.JEV_MODEL || "jev-latest",
       retry: { maxRetries: 0 },
-      timeout: 3000,
+      timeout: 5000,
     });
   }
   return client;
@@ -26,36 +26,79 @@ export async function evaluateWithJev(
 ): Promise<EvalResult> {
   const started = performance.now();
 
-  const rubricLevels = [
-    question.rubric.none.description,
-    ...(question.rubric.partial ? [question.rubric.partial.description] : []),
-    question.rubric.full.description,
-  ];
+  // Build questions dynamically:
+  // - each rubric item → noul (did the student earn this point?)
+  // - rating levels → choice (overall performance level)
+  const rubricQuestions = Object.fromEntries(
+    question.rubric.map((item, i) => [
+      `rubric_${i}`,
+      noul(`The student's answer satisfies: "${item.description}"`),
+    ])
+  );
 
-  const res = await getClient().systemOne({
-    state: {
-      question: question.stem,
-      correctAnswer: question.correctAnswer,
-      studentAnswer: answerText,
-    },
-    questions: {
-      rubricScore: score(
-        "How well does the student answer match the rubric for this question",
-        rubricLevels as [string, string, ...string[]]
-      ),
-      answerCorrect: noul("The student reached the correct final numerical answer"),
-      methodCorrect: noul("The student used a valid mathematical method or approach"),
-    },
-  });
+  const ratingChoices = Object.fromEntries(
+    question.rating.map((r) => [r.level, r.description])
+  ) as Record<string, string>;
+
+  const questions = {
+    ...rubricQuestions,
+    rating: choice("What is the overall performance level of this student's answer", ratingChoices),
+  };
+
+  const state = {
+    question: question.stem,
+    correctAnswer: question.correctAnswer,
+    studentAnswer: answerText,
+  };
+
+  const res = await getClient().systemOne({ state, questions });
 
   const latencyMs = Math.round(performance.now() - started);
-  const idx = res.answers.rubricScore.score; // 0-based index into rubricLevels
-  const scoreValue = Math.round((idx / (rubricLevels.length - 1)) * question.maxScore);
+
+  // Jev charges $0.042 per million input tokens, output is free.
+  // SDK doesn't expose token counts, so estimate from payload char count ÷ 4.
+  const inputPayload = JSON.stringify({ state, questions });
+  const estimatedInputTokens = Math.ceil(inputPayload.length / 4);
+  const JEV_INPUT_COST_PER_TOKEN = 0.042 / 1_000_000;
+  const jevCostUsd = estimatedInputTokens * JEV_INPUT_COST_PER_TOKEN;
+
+  // Compute score: each rubric noul probability > 0.5 earns its points
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const answers = res.answers as Record<string, any>;
+  const rubricBreakdown = question.rubric.map((item, i) => {
+    const probability: number = answers[`rubric_${i}`].noul;
+    const earned = probability > 0.5;
+    return { description: item.description, earned, probability };
+  });
+
+  const score = rubricBreakdown.reduce(
+    (sum, r, i) => sum + (r.earned ? question.rubric[i].score : 0),
+    0
+  );
+
+  const rating: string = answers.rating.choice;
 
   return {
-    score: scoreValue,
+    score,
     maxScore: question.maxScore,
-    reasoning: rubricLevels[idx] ?? "Unable to determine",
+    rubricBreakdown,
+    rating,
+    reasoning: rubricBreakdown
+      .map((r, i) => `${r.earned ? "✓" : "✗"} ${question.rubric[i].description}`)
+      .join(" · "),
     latencyMs,
+    cost: {
+      tokens: { inputTokens: estimatedInputTokens, outputTokens: 0 },
+      costUsd: jevCostUsd,
+      note: "Output tokens free. Input estimated (chars ÷ 4).",
+    },
+    raw: {
+      input: { state, questions: Object.fromEntries(
+        question.rubric.map((item, i) => [`rubric_${i}`, `noul("${item.description}")`])
+          .concat([["rating", `choice("overall level", ${JSON.stringify(ratingChoices)})`]])
+      )},
+      output: answers,
+      model: res.model,
+    },
   };
 }
