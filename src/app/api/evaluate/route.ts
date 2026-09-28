@@ -55,6 +55,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (ocrResult.status === "fulfilled") {
+      jevValue.ocrLatencyMs = ocrResult.value.latencyMs;
       jevValue.latencyMs += ocrResult.value.latencyMs; // OCR is part of Jev pipeline
     }
     if (ocrCost) {

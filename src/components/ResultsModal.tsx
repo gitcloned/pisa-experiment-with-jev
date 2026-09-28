@@ -162,15 +162,25 @@ export default function ResultsModal({ question, results, onNext, isLast }: Prop
                 <p className="text-xs font-semibold text-gray-400 mb-2">Speed</p>
                 {(["jev", "gemini"] as const).map((model) => {
                   const r = results[model];
+                  const totalPct = maxLatency ? Math.min(100, (r.latencyMs / maxLatency) * 100) : 0;
+                  const ocrPct = (model === "jev" && r.ocrLatencyMs && r.latencyMs)
+                    ? (r.ocrLatencyMs / r.latencyMs) * totalPct
+                    : 0;
+                  const evalPct = totalPct - ocrPct;
+                  const hasOcr = model === "jev" && !!r.ocrLatencyMs;
                   return (
                     <div key={model} className="flex items-center gap-2 mb-1.5 last:mb-0">
-                      <span className={`text-xs font-medium ${model === "jev" ? "text-purple-600 w-10" : "text-teal-600 w-28"}`}>
-                        {model === "jev" ? "JEV" : "Gemini 3.8 Flash"}
+                      <span className={`text-xs font-medium shrink-0 ${model === "jev" ? "text-purple-600" : "text-teal-600"}`}
+                        style={{ width: hasOcr ? "5.5rem" : model === "jev" ? "2.5rem" : "7rem" }}>
+                        {model === "jev" ? (hasOcr ? "JEV + OCR" : "JEV") : "Gemini 3.8 Flash"}
                       </span>
-                      <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                      <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden flex">
+                        {hasOcr && (
+                          <div className="h-full bg-purple-800" style={{ width: `${ocrPct}%` }} />
+                        )}
                         <div
-                          className={`h-full rounded-full ${model === "jev" ? "bg-purple-400" : "bg-teal-400"}`}
-                          style={{ width: `${maxLatency ? Math.min(100, (r.latencyMs / maxLatency) * 100) : 0}%` }}
+                          className={`h-full ${model === "jev" ? "bg-purple-400" : "bg-teal-400"}`}
+                          style={{ width: `${evalPct}%` }}
                         />
                       </div>
                       <span className="text-xs text-gray-500 w-14 text-right">{r.latencyMs}ms</span>
