@@ -197,13 +197,27 @@ export default function ResultsModal({ question, results, onNext, isLast }: Prop
                     <span className="text-center text-purple-600 font-medium">{jev.cost?.tokens.outputTokens ?? "—"} (free)</span>
                     <span className="text-center text-teal-600 font-medium">{gemini.cost?.tokens.outputTokens ?? "—"}</span>
                   </div>
-                  <div className="grid grid-cols-[1fr_80px_80px] gap-2 text-xs mb-2">
-                    <span className="font-semibold text-gray-700">Est. cost</span>
-                    <span className="text-center text-purple-700 font-bold">{jev.cost ? `$${jev.cost.costUsd.toFixed(7)}` : "—"}</span>
+                  <div className="grid grid-cols-[1fr_80px_80px] gap-2 text-xs text-gray-500 mb-1.5">
+                    <span>Eval cost</span>
+                    <span className="text-center text-purple-600 font-medium">{jev.cost ? `$${jev.cost.costUsd.toFixed(7)}` : "—"}</span>
+                    <span className="text-center text-teal-600 font-medium">{gemini.cost ? `$${gemini.cost.costUsd.toFixed(7)}` : "—"}</span>
+                  </div>
+                  {jev.ocrCost && (
+                    <div className="grid grid-cols-[1fr_80px_80px] gap-2 text-xs text-gray-500 mb-1.5">
+                      <span>OCR (Flash Lite)</span>
+                      <span className="text-center text-purple-600 font-medium">${jev.ocrCost.costUsd.toFixed(7)}</span>
+                      <span className="text-center text-gray-300">—</span>
+                    </div>
+                  )}
+                  <div className="grid grid-cols-[1fr_80px_80px] gap-2 text-xs border-t border-gray-200 pt-2 mt-1">
+                    <span className="font-semibold text-gray-700">Total cost</span>
+                    <span className="text-center text-purple-700 font-bold">
+                      {jev.cost ? `$${((jev.cost.costUsd) + (jev.ocrCost?.costUsd ?? 0)).toFixed(7)}` : "—"}
+                    </span>
                     <span className="text-center text-teal-700 font-bold">{gemini.cost ? `$${gemini.cost.costUsd.toFixed(7)}` : "—"}</span>
                   </div>
                   {(jev.cost?.note || gemini.cost?.note) && (
-                    <div className="border-t border-gray-200 pt-2 flex flex-col gap-1">
+                    <div className="border-t border-gray-200 pt-2 mt-2 flex flex-col gap-1">
                       {jev.cost?.note && <p className="text-xs text-purple-500">Jev: {jev.cost.note}</p>}
                       {gemini.cost?.note && <p className="text-xs text-teal-500">Gemini: {gemini.cost.note}</p>}
                     </div>

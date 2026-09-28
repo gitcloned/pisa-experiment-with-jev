@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { loadQuestion } from "@/lib/questions";
 import { evaluateWithJev, jevAvailable } from "@/lib/jev";
-import { evaluateWithGemini, geminiAvailable } from "@/lib/gemini";
-import type { EvalResult } from "@/types";
+import { evaluateWithGemini, geminiAvailable, ocrImageWithGemini } from "@/lib/gemini";
+import type { EvalResult, CostBreakdown } from "@/types";
 
 export const runtime = "nodejs";
 
@@ -25,6 +25,50 @@ export async function POST(req: NextRequest) {
   const text = answerText || "";
   const imageOnly = !!answerImage && !text;
 
+  let jevText = text;
+  let ocrCost: CostBreakdown | undefined;
+
+  if (imageOnly && geminiAvailable()) {
+    // Run OCR and Gemini main eval in parallel (both need the image)
+    const [ocrResult, geminiResult] = await Promise.allSettled([
+      ocrImageWithGemini(answerImage),
+      evaluateWithGemini(question, text, answerImage),
+    ]);
+
+    if (ocrResult.status === "rejected") console.error("[ocr]", ocrResult.reason);
+    if (geminiResult.status === "rejected") console.error("[gemini]", geminiResult.reason);
+
+    if (ocrResult.status === "fulfilled") {
+      jevText = ocrResult.value.text;
+      ocrCost = ocrResult.value.cost;
+    }
+
+    // Jev runs after OCR so it has the extracted text
+    let jevValue: EvalResult;
+    try {
+      jevValue = jevAvailable()
+        ? await evaluateWithJev(question, jevText)
+        : fallback(question.maxScore, "No Jev API key configured");
+    } catch (e) {
+      console.error("[jev]", e);
+      jevValue = fallback(question.maxScore, "Jev evaluation failed");
+    }
+
+    if (ocrCost) {
+      jevValue.ocrCost = ocrCost;
+      if (jevValue.cost) jevValue.cost.note = "Jev eval of OCR-extracted text";
+    }
+
+    return NextResponse.json({
+      jev: jevValue,
+      gemini:
+        geminiResult.status === "fulfilled"
+          ? geminiResult.value
+          : fallback(question.maxScore, "Gemini evaluation failed"),
+    });
+  }
+
+  // Text answer (or text + image): run Jev and Gemini in parallel
   const [jevResult, geminiResult] = await Promise.allSettled([
     jevAvailable()
       ? evaluateWithJev(question, text)
@@ -37,19 +81,8 @@ export async function POST(req: NextRequest) {
   if (jevResult.status === "rejected") console.error("[jev]", jevResult.reason);
   if (geminiResult.status === "rejected") console.error("[gemini]", geminiResult.reason);
 
-  // For image-only answers, Jev can't process the image directly.
-  // The pipeline would require: Gemini OCR → extracted text → Jev eval.
-  // Flag this on the Jev result so the UI can explain the extra cost step.
-  const jevValue = jevResult.status === "fulfilled" ? jevResult.value : fallback(question.maxScore, "Jev evaluation failed");
-  if (imageOnly && jevValue.cost) {
-    jevValue.cost.note = "Cost shown is Jev-only (evaluated empty text). Real image pipeline needs OCR first (extra Gemini call ~$0.001), not included here.";
-  }
-
   return NextResponse.json({
-    jev: jevValue,
-    gemini:
-      geminiResult.status === "fulfilled"
-        ? geminiResult.value
-        : fallback(question.maxScore, "Gemini evaluation failed"),
+    jev: jevResult.status === "fulfilled" ? jevResult.value : fallback(question.maxScore, "Jev evaluation failed"),
+    gemini: geminiResult.status === "fulfilled" ? geminiResult.value : fallback(question.maxScore, "Gemini evaluation failed"),
   });
 }

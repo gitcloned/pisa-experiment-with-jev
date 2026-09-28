@@ -45,6 +45,7 @@ export interface EvalResult {
   reasoning: string;
   latencyMs: number;
   cost?: CostBreakdown;
+  ocrCost?: CostBreakdown; // set when image was OCR'd before Jev eval
   error?: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   raw?: Record<string, any>;

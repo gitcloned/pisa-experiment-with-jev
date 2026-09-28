@@ -1,6 +1,6 @@
 import "server-only";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import type { Question, EvalResult } from "@/types";
+import type { Question, EvalResult, CostBreakdown } from "@/types";
 
 let genai: GoogleGenerativeAI | null = null;
 
@@ -102,6 +102,42 @@ Respond with ONLY valid JSON, no markdown:
       output: json,
       model: "gemini-3.8-flash",
       usage: { inputTokens, outputTokens },
+    },
+  };
+}
+
+// Gemini 2.0 Flash Lite: $0.075/M input, $0.30/M output
+const OCR_INPUT_COST_PER_TOKEN = 0.075 / 1_000_000;
+const OCR_OUTPUT_COST_PER_TOKEN = 0.30 / 1_000_000;
+
+export async function ocrImageWithGemini(
+  imageBase64: string
+): Promise<{ text: string; cost: CostBreakdown; latencyMs: number }> {
+  const started = performance.now();
+  const model = getGenai().getGenerativeModel({ model: "gemini-2.0-flash-lite" });
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const parts: any[] = [
+    "Extract all text and mathematical expressions from this image. Return only the extracted content, nothing else.",
+    { inlineData: { mimeType: "image/jpeg", data: imageBase64 } },
+  ];
+
+  const result = await model.generateContent(parts);
+  const text = result.response.text().trim();
+  const latencyMs = Math.round(performance.now() - started);
+
+  const usage = result.response.usageMetadata;
+  const inputTokens = usage?.promptTokenCount ?? 0;
+  const outputTokens = usage?.candidatesTokenCount ?? 0;
+  const costUsd = inputTokens * OCR_INPUT_COST_PER_TOKEN + outputTokens * OCR_OUTPUT_COST_PER_TOKEN;
+
+  return {
+    text,
+    latencyMs,
+    cost: {
+      tokens: { inputTokens, outputTokens },
+      costUsd,
+      note: "Vision OCR via gemini-2.0-flash-lite",
     },
   };
 }
