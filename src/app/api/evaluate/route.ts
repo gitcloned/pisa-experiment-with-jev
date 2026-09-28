@@ -54,6 +54,9 @@ export async function POST(req: NextRequest) {
       jevValue = fallback(question.maxScore, "Jev evaluation failed");
     }
 
+    if (ocrResult.status === "fulfilled") {
+      jevValue.latencyMs += ocrResult.value.latencyMs; // OCR is part of Jev pipeline
+    }
     if (ocrCost) {
       jevValue.ocrCost = ocrCost;
       if (jevValue.cost) jevValue.cost.note = "Jev eval of OCR-extracted text";

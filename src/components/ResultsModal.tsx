@@ -98,7 +98,7 @@ export default function ResultsModal({ question, results, onNext, isLast }: Prop
               <div className="grid grid-cols-[1fr_80px_80px] gap-2 items-center">
                 <span className="text-xs text-gray-400 font-medium">Rubric criterion</span>
                 <span className="text-xs font-bold text-purple-600 text-center">JEV</span>
-                <span className="text-xs font-bold text-teal-600 text-center">GEMINI</span>
+                <span className="text-xs font-bold text-teal-600 text-center">Gemini 3.8 Flash</span>
               </div>
 
               {/* Per-rubric rows */}
@@ -164,8 +164,8 @@ export default function ResultsModal({ question, results, onNext, isLast }: Prop
                   const r = results[model];
                   return (
                     <div key={model} className="flex items-center gap-2 mb-1.5 last:mb-0">
-                      <span className={`text-xs font-medium w-14 ${model === "jev" ? "text-purple-600" : "text-teal-600"}`}>
-                        {model.toUpperCase()}
+                      <span className={`text-xs font-medium ${model === "jev" ? "text-purple-600 w-10" : "text-teal-600 w-28"}`}>
+                        {model === "jev" ? "JEV" : "Gemini 3.8 Flash"}
                       </span>
                       <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                         <div
