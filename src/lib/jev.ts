@@ -62,7 +62,6 @@ export async function evaluateWithJev(
   const JEV_INPUT_COST_PER_TOKEN = 0.042 / 1_000_000;
   const jevCostUsd = estimatedInputTokens * JEV_INPUT_COST_PER_TOKEN;
 
-  // Compute score: each rubric noul probability > 0.5 earns its points
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const answers = res.answers as Record<string, any>;
   const rubricBreakdown = question.rubric.map((item, i) => {
@@ -71,10 +70,12 @@ export async function evaluateWithJev(
     return { description: item.description, earned, probability };
   });
 
-  const score = rubricBreakdown.reduce(
-    (sum, r, i) => sum + (r.earned ? question.rubric[i].score : 0),
+  // Score = sum of (probability × item score), rounded to nearest 0.5
+  const rawScore = rubricBreakdown.reduce(
+    (sum, r, i) => sum + r.probability * question.rubric[i].score,
     0
   );
+  const score = Math.round(rawScore * 2) / 2;
 
   const rating: string = answers.rating.choice;
 

@@ -80,10 +80,12 @@ Respond with ONLY valid JSON, no markdown:
     probability: Number(json.rubricBreakdown?.[i]?.probability ?? (json.rubricBreakdown?.[i]?.earned ? 1 : 0)),
   }));
 
-  const score = rubricBreakdown.reduce(
-    (sum, r, i) => sum + (r.earned ? question.rubric[i].score : 0),
+  // Score = sum of (probability × item score), rounded to nearest 0.5
+  const rawScore = rubricBreakdown.reduce(
+    (sum, r, i) => sum + r.probability * question.rubric[i].score,
     0
   );
+  const score = Math.round(rawScore * 2) / 2;
 
   return {
     score,
