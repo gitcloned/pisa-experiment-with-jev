@@ -1,13 +1,19 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
 import type { Section, Question, EvaluationResponse } from "@/types";
 import StimulusPanel from "@/components/StimulusPanel";
 import QuestionPanel from "@/components/QuestionPanel";
 import AnswerModal from "@/components/AnswerModal";
 import ResultsModal from "@/components/ResultsModal";
 
-type View = "stimulus" | "question";
+type View = "stimulus" | "question" | "done";
+
+interface CompletedResult {
+  question: Question;
+  eval: EvaluationResponse;
+}
 
 interface Props {
   section: Section;
@@ -21,10 +27,10 @@ export default function AssessmentClient({ section, questions }: Props) {
   const [resultsModalOpen, setResultsModalOpen] = useState(false);
   const [results, setResults] = useState<EvaluationResponse | null>(null);
   const [loading, setLoading] = useState(false);
-  const [stimulusOpen, setStimulusOpen] = useState(false); // mobile re-open
+  const [stimulusOpen, setStimulusOpen] = useState(false);
+  const [completedResults, setCompletedResults] = useState<CompletedResult[]>([]);
   const questionStartRef = useRef<number>(Date.now());
 
-  // Reset timer whenever the question changes
   useEffect(() => {
     questionStartRef.current = Date.now();
   }, [currentIdx]);
@@ -48,8 +54,9 @@ export default function AssessmentClient({ section, questions }: Props) {
           timeSolveSec,
         }),
       });
-      const data = await res.json();
+      const data: EvaluationResponse = await res.json();
       setResults(data);
+      setCompletedResults((prev) => [...prev, { question, eval: data }]);
       setResultsModalOpen(true);
     } finally {
       setLoading(false);
@@ -59,9 +66,72 @@ export default function AssessmentClient({ section, questions }: Props) {
   function handleNext() {
     setResultsModalOpen(false);
     setResults(null);
-    if (!isLast) {
+    if (isLast) {
+      setView("done");
+    } else {
       setCurrentIdx((i) => i + 1);
     }
+  }
+
+  // ── End screen ──────────────────────────────────────────────────────────
+  if (view === "done") {
+    const maxScore = questions.reduce((s, q) => s + q.maxScore, 0);
+    const jevTotal = completedResults.reduce((s, r) => s + (r.eval.jev.error ? 0 : r.eval.jev.score), 0);
+    const geminiTotal = completedResults.reduce((s, r) => s + (r.eval.gemini.error ? 0 : r.eval.gemini.score), 0);
+
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <div className="flex-1 overflow-y-auto px-4 py-8 max-w-lg mx-auto w-full">
+          <p className="text-center text-3xl mb-2">✅</p>
+          <h2 className="text-xl font-bold text-gray-900 text-center mb-1">{section.title} — Complete</h2>
+          <p className="text-sm text-gray-400 text-center mb-6">{questions.length} question{questions.length !== 1 ? "s" : ""} answered</p>
+
+          {/* Total score cards */}
+          <div className="grid grid-cols-2 gap-3 mb-6">
+            <div className="bg-purple-50 rounded-2xl p-4 text-center border border-purple-100">
+              <p className="text-xs font-bold text-purple-500 tracking-wide mb-1">JEV</p>
+              <p className="text-3xl font-bold text-purple-700">{jevTotal}</p>
+              <p className="text-xs text-purple-400">/ {maxScore}</p>
+            </div>
+            <div className="bg-teal-50 rounded-2xl p-4 text-center border border-teal-100">
+              <p className="text-xs font-bold text-teal-500 tracking-wide mb-1">GEMINI</p>
+              <p className="text-3xl font-bold text-teal-700">{geminiTotal}</p>
+              <p className="text-xs text-teal-400">/ {maxScore}</p>
+            </div>
+          </div>
+
+          {/* Per-question breakdown */}
+          <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden mb-6">
+            <div className="grid grid-cols-[1fr_56px_56px] gap-2 px-4 py-2 bg-gray-50 border-b border-gray-100">
+              <span className="text-xs text-gray-400 font-medium">Question</span>
+              <span className="text-xs font-bold text-purple-600 text-center">JEV</span>
+              <span className="text-xs font-bold text-teal-600 text-center">GEM</span>
+            </div>
+            {completedResults.map((r, i) => (
+              <div key={i} className="grid grid-cols-[1fr_56px_56px] gap-2 px-4 py-3 border-b border-gray-50 last:border-0 items-center">
+                <p className="text-xs text-gray-700 line-clamp-1">{r.question.stem.substring(0, 60)}{r.question.stem.length > 60 ? "…" : ""}</p>
+                <p className="text-sm font-bold text-purple-600 text-center">
+                  {r.eval.jev.error ? "—" : `${r.eval.jev.score}/${r.question.maxScore}`}
+                </p>
+                <p className="text-sm font-bold text-teal-600 text-center">
+                  {r.eval.gemini.error ? "—" : `${r.eval.gemini.score}/${r.question.maxScore}`}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="shrink-0 p-4 bg-white border-t border-gray-100">
+          <Link
+            href="/"
+            className="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3.5 font-semibold text-base transition-colors"
+          >
+            ← Go Home
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   // ── Desktop: always show split layout ──────────────────────────────────
