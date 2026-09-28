@@ -2,7 +2,7 @@ import "server-only";
 import { Pool } from "pg";
 
 const pool = new Pool({
-  connectionString: process.env.NEON_STORAGE_NILEDB_POSTGRES_URL,
+  connectionString: process.env.NEON_STORAGE_NILEDB_URL ?? process.env.NEON_STORAGE_NILEDB_POSTGRES_URL,
   ssl: { rejectUnauthorized: false },
   max: 5,
 });
