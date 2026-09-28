@@ -1,0 +1,38 @@
+{
+  "id": 1,
+  "stem": "Complete the table below showing the number of apple trees and number of conifers for each value of n.\n\nn=1: apple trees=1, conifers=8\nn=2: apple trees=4, conifers=?\nn=3: apple trees=?, conifers=?\nn=4: apple trees=?, conifers=?\nn=5: apple trees=?, conifers=?",
+  "correctAnswer": "n=2: 4 trees, 16 conifers; n=3: 9 trees, 24 conifers; n=4: 16 trees, 32 conifers; n=5: 25 trees, 40 conifers",
+  "avg_time_to_solve_sec": 120,
+  "steps": [
+    "Apple trees = n², conifers = 8n",
+    "n=2: 4 trees, 16 conifers",
+    "n=3: 9 trees, 24 conifers",
+    "n=4: 16 trees, 32 conifers",
+    "n=5: 25 trees, 40 conifers"
+  ],
+  "rubric": [
+    {
+      "score": 1,
+      "description": "All values for number of apple trees correct (4, 9, 16, 25 for n=2,3,4,5)"
+    },
+    {
+      "score": 1,
+      "description": "All values for number of conifers correct (16, 24, 32, 40 for n=2,3,4,5)"
+    }
+  ],
+  "rating": [
+    {
+      "level": "proficient",
+      "description": "All entries correct with clear understanding of the pattern"
+    },
+    {
+      "level": "learning",
+      "description": "Mostly correct with one or two errors in the table entries"
+    },
+    {
+      "level": "need_attention",
+      "description": "More than two errors or no valid pattern identified"
+    }
+  ],
+  "maxScore": 2
+}

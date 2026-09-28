@@ -1,0 +1,36 @@
+{
+  "id": 3,
+  "stem": "What can you say about the speed of the car between the 2.6 km and 2.8 km marks on the track? Describe what is happening and explain what this tells you about that section of the track.",
+  "correctAnswer": "The speed is increasing between 2.6 km and 2.8 km, meaning the car is accelerating — this indicates the track is a straight section (no bends) allowing the car to speed up.",
+  "avg_time_to_solve_sec": 90,
+  "steps": [
+    "Look at the graph between 2.6 km and 2.8 km",
+    "The graph shows an upward trend — speed is increasing",
+    "Increasing speed on a flat track means the car is on a straight and accelerating"
+  ],
+  "rubric": [
+    {
+      "score": 1,
+      "description": "Correctly states that the speed is increasing between 2.6 km and 2.8 km"
+    },
+    {
+      "score": 1,
+      "description": "Provides an explanation linking increasing speed to track shape (straight section) or the car accelerating"
+    }
+  ],
+  "rating": [
+    {
+      "level": "proficient",
+      "description": "Correctly identifies increasing speed and gives a valid explanation about the track or car behaviour"
+    },
+    {
+      "level": "learning",
+      "description": "Correctly identifies the speed trend but explanation is incomplete or missing"
+    },
+    {
+      "level": "need_attention",
+      "description": "Incorrect speed description or no valid reasoning provided"
+    }
+  ],
+  "maxScore": 2
+}

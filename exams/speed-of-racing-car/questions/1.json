@@ -1,0 +1,31 @@
+{
+  "id": 1,
+  "stem": "What is the approximate distance from the starting line to the beginning of the longest straight section of the track?",
+  "correctAnswer": "1.5 km",
+  "avg_time_to_solve_sec": 60,
+  "steps": [
+    "Identify where speed is highest and most sustained (longest flat top on graph)",
+    "The longest straight section starts at approximately 1.5 km"
+  ],
+  "rubric": [
+    {
+      "score": 1,
+      "description": "Correct answer: approximately 1.5 km from the starting line"
+    }
+  ],
+  "rating": [
+    {
+      "level": "proficient",
+      "description": "Correct answer by correctly reading the graph"
+    },
+    {
+      "level": "learning",
+      "description": "Answer is close but slightly off (e.g. 1.3 or 1.7 km) suggesting approximate graph reading"
+    },
+    {
+      "level": "need_attention",
+      "description": "Incorrect answer or misreads the graph entirely"
+    }
+  ],
+  "maxScore": 1
+}

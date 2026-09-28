@@ -1,0 +1,36 @@
+{
+  "id": 3,
+  "stem": "According to the graph, on average, during which period in their life are females taller than males of the same age?",
+  "correctAnswer": "From approximately age 11 to age 13 (i.e. when they are 11 and 12 years old)",
+  "avg_time_to_solve_sec": 75,
+  "steps": [
+    "Find where the female line is above the male line",
+    "The lines cross at approximately age 11 (female overtakes male) and age 13 (male overtakes female)",
+    "Females are taller than males between ages 11 and 13"
+  ],
+  "rubric": [
+    {
+      "score": 1,
+      "description": "Correct period identified: approximately ages 11 to 13 (or states age 11 and 12)"
+    },
+    {
+      "score": 1,
+      "description": "Correctly reads both crossover points from the graph to define the start and end of the period"
+    }
+  ],
+  "rating": [
+    {
+      "level": "proficient",
+      "description": "Correct interval (11 to 13) identified by reading both crossover points on the graph"
+    },
+    {
+      "level": "learning",
+      "description": "Partially correct — identifies one crossover point or gives an approximate range close to 11-13"
+    },
+    {
+      "level": "need_attention",
+      "description": "Incorrect period or misreads the graph (e.g. says females are always taller or gives wrong ages)"
+    }
+  ],
+  "maxScore": 2
+}

@@ -1,0 +1,32 @@
+{
+  "id": 1,
+  "stem": "Since 1980 the average height of 20-year-old females has increased by 2.3 cm, to 170.6 cm. What was the average height of a 20-year-old female in 1980?",
+  "correctAnswer": "168.3 cm",
+  "avg_time_to_solve_sec": 60,
+  "steps": [
+    "Current height = 170.6 cm",
+    "Increase since 1980 = 2.3 cm",
+    "Height in 1980 = 170.6 - 2.3 = 168.3 cm"
+  ],
+  "rubric": [
+    {
+      "score": 1,
+      "description": "Correct answer: 168.3 cm"
+    }
+  ],
+  "rating": [
+    {
+      "level": "proficient",
+      "description": "Correct answer of 168.3 cm with correct subtraction"
+    },
+    {
+      "level": "learning",
+      "description": "Correct method but arithmetic error, or answer given without working"
+    },
+    {
+      "level": "need_attention",
+      "description": "Incorrect answer or wrong operation used (e.g. addition instead of subtraction)"
+    }
+  ],
+  "maxScore": 1
+}

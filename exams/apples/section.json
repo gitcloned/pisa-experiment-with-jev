@@ -1,0 +1,7 @@
+{
+  "id": "apples",
+  "title": "Apples",
+  "description": "A farmer plants apple trees in a square pattern. To protect them from the wind, he plants conifers all around the orchard. The diagram shows the pattern for any number (n) of rows of apple trees.",
+  "imageFile": "apples.png",
+  "imageAlt": "Diagram showing apple trees arranged in a square pattern surrounded by conifers, illustrated for n=1, 2, 3 and 4 rows of apple trees"
+}

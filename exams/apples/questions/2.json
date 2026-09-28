@@ -1,0 +1,38 @@
+{
+  "id": 2,
+  "stem": "There are two formulas you can use:\n  Number of apple trees = n²\n  Number of conifers = 8n\nwhere n is the number of rows of apple trees.\n\nThere is a value of n for which the number of apple trees equals the number of conifers. Find the value of n and show your working.",
+  "correctAnswer": "n = 8 (since n² = 8n gives n = 8, or n = 0)",
+  "avg_time_to_solve_sec": 90,
+  "steps": [
+    "Set n² = 8n",
+    "n² - 8n = 0",
+    "n(n - 8) = 0",
+    "n = 0 or n = 8",
+    "n = 8 (the meaningful answer)"
+  ],
+  "rubric": [
+    {
+      "score": 1,
+      "description": "Correct answer of n = 8"
+    },
+    {
+      "score": 1,
+      "description": "Valid method shown (e.g. setting n² = 8n and solving, or systematic table comparison)"
+    }
+  ],
+  "rating": [
+    {
+      "level": "proficient",
+      "description": "Correct answer with valid algebraic or systematic method shown"
+    },
+    {
+      "level": "learning",
+      "description": "Correct answer but method not shown, or method correct with minor error"
+    },
+    {
+      "level": "need_attention",
+      "description": "Incorrect answer or no valid method attempted"
+    }
+  ],
+  "maxScore": 2
+}

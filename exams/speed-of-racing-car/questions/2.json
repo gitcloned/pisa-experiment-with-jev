@@ -1,0 +1,31 @@
+{
+  "id": 2,
+  "stem": "Where was the lowest speed recorded during the second lap?",
+  "correctAnswer": "At about 1.3 km along the track",
+  "avg_time_to_solve_sec": 60,
+  "steps": [
+    "Find the lowest point on the graph",
+    "The minimum speed occurs at approximately 1.3 km"
+  ],
+  "rubric": [
+    {
+      "score": 1,
+      "description": "Correct answer: lowest speed is at approximately 1.3 km along the track"
+    }
+  ],
+  "rating": [
+    {
+      "level": "proficient",
+      "description": "Correctly identifies the minimum point on the graph at ~1.3 km"
+    },
+    {
+      "level": "learning",
+      "description": "Identifies a nearby point but not the exact minimum"
+    },
+    {
+      "level": "need_attention",
+      "description": "Incorrect answer or unable to read the minimum from the graph"
+    }
+  ],
+  "maxScore": 1
+}

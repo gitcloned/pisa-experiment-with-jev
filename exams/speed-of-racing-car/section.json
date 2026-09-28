@@ -1,0 +1,7 @@
+{
+  "id": "speed-of-racing-car",
+  "title": "Speed of a Racing Car",
+  "description": "The graph shows how the speed of a racing car varies along a flat 3 kilometre track during its second lap. The horizontal axis shows distance along the track in km, and the vertical axis shows speed in km/h.",
+  "imageFile": "speed-of-racing-car.png",
+  "imageAlt": "Line graph of racing car speed (0–180 km/h) vs distance along a 3 km track, showing speed changes through bends and straight sections"
+}

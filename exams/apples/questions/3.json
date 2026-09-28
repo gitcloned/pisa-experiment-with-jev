@@ -1,0 +1,36 @@
+{
+  "id": 3,
+  "stem": "Suppose the farmer wants to make a much larger orchard with many rows of trees. As the farmer makes the orchard bigger, which will increase more quickly: the number of apple trees or the number of conifers? Explain how you found your answer.",
+  "correctAnswer": "Apple trees (n²) increase more quickly than conifers (8n) for large n, because n² is quadratic while 8n is linear — for large n, n² grows much faster.",
+  "avg_time_to_solve_sec": 120,
+  "steps": [
+    "Apple trees = n², conifers = 8n",
+    "For large n, n² grows quadratically, 8n grows linearly",
+    "Therefore apple trees increase more quickly"
+  ],
+  "rubric": [
+    {
+      "score": 1,
+      "description": "Correct answer: apple trees increase more quickly"
+    },
+    {
+      "score": 1,
+      "description": "Valid mathematical explanation comparing n² (quadratic) to 8n (linear), or using specific examples from the table to show apple trees overtake"
+    }
+  ],
+  "rating": [
+    {
+      "level": "proficient",
+      "description": "Correct answer with clear mathematical reasoning about the growth rates"
+    },
+    {
+      "level": "learning",
+      "description": "Correct answer with partial explanation, or uses examples without full reasoning"
+    },
+    {
+      "level": "need_attention",
+      "description": "Incorrect answer or no valid explanation given"
+    }
+  ],
+  "maxScore": 2
+}

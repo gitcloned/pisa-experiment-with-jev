@@ -1,0 +1,7 @@
+{
+  "id": "growing-up",
+  "title": "Growing Up",
+  "description": "In 1998 the average height of both young males and young females in the Netherlands is represented in this graph. The horizontal axis shows age in years (10–20), and the vertical axis shows height in cm (130–190).",
+  "imageFile": "growing-up.png",
+  "imageAlt": "Line graph showing average height in cm vs age in years for young males and females in the Netherlands in 1998, with two curves crossing around age 11-13"
+}

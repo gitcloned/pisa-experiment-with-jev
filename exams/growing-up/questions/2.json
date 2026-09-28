@@ -1,0 +1,37 @@
+{
+  "id": 2,
+  "stem": "Explain how the graph shows that on average the growth rate for girls slows down after 12 years of age.",
+  "correctAnswer": "The line for females becomes less steep (the gradient decreases) after age 12, meaning the height is increasing more slowly — i.e. the growth rate slows down.",
+  "avg_time_to_solve_sec": 90,
+  "steps": [
+    "Look at the slope of the female line before and after age 12",
+    "Before age 12: the female line rises steeply",
+    "After age 12: the female line becomes flatter (less steep)",
+    "A flatter slope = slower rate of height increase = slower growth rate"
+  ],
+  "rubric": [
+    {
+      "score": 1,
+      "description": "States that the female curve becomes less steep or flatter after age 12"
+    },
+    {
+      "score": 1,
+      "description": "Explicitly links the reduced steepness to slower growth rate, using gradient, slope, or rate of change language, or by comparing height gains before and after age 12"
+    }
+  ],
+  "rating": [
+    {
+      "level": "proficient",
+      "description": "Clear explanation referencing the reduced slope or gradient of the female curve after age 12"
+    },
+    {
+      "level": "learning",
+      "description": "Correct observation about the curve flattening but without clearly linking to growth rate"
+    },
+    {
+      "level": "need_attention",
+      "description": "Incorrect or irrelevant explanation (e.g. refers to females being shorter than males rather than the growth rate)"
+    }
+  ],
+  "maxScore": 2
+}
