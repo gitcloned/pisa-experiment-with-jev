@@ -16,18 +16,10 @@ export default async function Home() {
     <main className="min-h-screen bg-gray-50">
       <SignInBanner session={session} />
       {!session && <SignInModal />}
-      {/* Hero */}
-      <div className="bg-white border-b border-gray-100 px-6 py-10 text-center">
-        <p className="text-xs font-semibold tracking-widest text-blue-500 uppercase mb-2">PISA Math Assessment</p>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Jev vs Gemini</h1>
-        <p className="text-sm text-gray-400 max-w-xs mx-auto">
-          Answer real PISA questions. Two AI models evaluate your work in parallel — compare speed, accuracy, and cost.
-        </p>
-      </div>
 
       {/* Section cards */}
       <div className="max-w-lg mx-auto px-4 py-6 flex flex-col gap-4">
-        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1">Choose a section</p>
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 pt-2">Choose a section</p>
         {sectionsWithCount.map((s) => (
           <div key={s.id} className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
             {s.imageFile && (
@@ -36,6 +28,7 @@ export default async function Home() {
                   src={`/exams/${s.id}/${s.imageFile}`}
                   alt={s.imageAlt ?? s.title}
                   fill
+                  sizes="(max-width: 512px) 100vw, 512px"
                   className="object-cover object-top"
                 />
               </div>
