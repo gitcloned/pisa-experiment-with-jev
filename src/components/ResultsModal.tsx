@@ -25,11 +25,10 @@ function RatingBadge({ rating }: { rating?: string }) {
   );
 }
 
-function ProbabilityDot({ earned }: { probability: number; earned: boolean }) {
+function ItemScore({ probability, itemScore }: { probability: number; itemScore: number }) {
+  const score = Math.round(probability * itemScore * 2) / 2;
   return (
-    <span className={`font-semibold text-sm ${earned ? "text-green-600" : "text-red-400"}`}>
-      {earned ? "✓" : "✗"}
-    </span>
+    <span className="text-sm font-semibold text-gray-700">{score}</span>
   );
 }
 
@@ -115,14 +114,14 @@ export default function ResultsModal({ question, results, onNext, isLast }: Prop
                       </div>
                       <div className="flex justify-center">
                         {jevR ? (
-                          <ProbabilityDot probability={jevR.probability} earned={jevR.earned} />
+                          <ItemScore probability={jevR.probability} itemScore={item.score} />
                         ) : (
                           <span className="text-xs text-gray-300">—</span>
                         )}
                       </div>
                       <div className="flex justify-center">
                         {gemR ? (
-                          <ProbabilityDot probability={gemR.probability} earned={gemR.earned} />
+                          <ItemScore probability={gemR.probability} itemScore={item.score} />
                         ) : (
                           <span className="text-xs text-gray-300">—</span>
                         )}
