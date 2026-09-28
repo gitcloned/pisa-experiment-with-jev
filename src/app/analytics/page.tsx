@@ -3,8 +3,16 @@ import { getUsers, initDb } from "@/lib/db";
 export const dynamic = "force-dynamic";
 
 export default async function AnalyticsPage() {
-  await initDb();
-  const users = await getUsers();
+  let users: Awaited<ReturnType<typeof getUsers>> = [];
+  let error: string | null = null;
+
+  try {
+    await initDb();
+    users = await getUsers();
+  } catch (e) {
+    console.error("[analytics]", e);
+    error = e instanceof Error ? e.message : String(e);
+  }
 
   return (
     <main className="min-h-screen bg-gray-50 p-6">
@@ -22,6 +30,13 @@ export default async function AnalyticsPage() {
             Raw JSON
           </a>
         </div>
+
+        {error && (
+          <div className="mb-4 bg-red-50 border border-red-200 rounded-xl p-4 text-xs text-red-700 font-mono break-all">
+            <p className="font-semibold mb-1">DB error</p>
+            {error}
+          </div>
+        )}
 
         <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
