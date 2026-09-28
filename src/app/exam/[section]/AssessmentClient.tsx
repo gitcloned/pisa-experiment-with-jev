@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import type { Section, Question, EvaluationResponse } from "@/types";
 import StimulusPanel from "@/components/StimulusPanel";
 import QuestionPanel from "@/components/QuestionPanel";
@@ -22,11 +22,18 @@ export default function AssessmentClient({ section, questions }: Props) {
   const [results, setResults] = useState<EvaluationResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [stimulusOpen, setStimulusOpen] = useState(false); // mobile re-open
+  const questionStartRef = useRef<number>(Date.now());
+
+  // Reset timer whenever the question changes
+  useEffect(() => {
+    questionStartRef.current = Date.now();
+  }, [currentIdx]);
 
   const question = questions[currentIdx];
   const isLast = currentIdx === questions.length - 1;
 
   async function handleSubmit(answerText: string, answerImage?: string) {
+    const timeSolveSec = Math.round((Date.now() - questionStartRef.current) / 1000);
     setLoading(true);
     setAnswerModalOpen(false);
     try {
@@ -38,6 +45,7 @@ export default function AssessmentClient({ section, questions }: Props) {
           questionId: question.id,
           answerText,
           answerImage,
+          timeSolveSec,
         }),
       });
       const data = await res.json();

@@ -12,6 +12,7 @@ export interface Question {
   id: number;
   stem: string;
   correctAnswer: string;
+  avg_time_to_solve_sec: number;
   steps: string[];
   rubric: RubricItem[];
   rating: RatingLevel[];

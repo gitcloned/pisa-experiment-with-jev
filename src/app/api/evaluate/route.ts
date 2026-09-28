@@ -15,7 +15,7 @@ const fallback = (maxScore: number, reason: string): EvalResult => ({
 });
 
 export async function POST(req: NextRequest) {
-  const { sectionId, questionId, answerText, answerImage } = await req.json();
+  const { sectionId, questionId, answerText, answerImage, timeSolveSec } = await req.json();
 
   if (!sectionId || !questionId) {
     return NextResponse.json({ error: "Missing sectionId or questionId" }, { status: 400 });
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     // Run OCR and Gemini main eval in parallel (both need the image)
     const [ocrResult, geminiResult] = await Promise.allSettled([
       ocrImageWithGemini(answerImage),
-      evaluateWithGemini(question, text, answerImage),
+      evaluateWithGemini(question, text, answerImage, timeSolveSec),
     ]);
 
     if (ocrResult.status === "rejected") console.error("[ocr]", ocrResult.reason);
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
     let jevValue: EvalResult;
     try {
       jevValue = jevAvailable()
-        ? await evaluateWithJev(question, jevText)
+        ? await evaluateWithJev(question, jevText, timeSolveSec)
         : fallback(question.maxScore, "No Jev API key configured");
     } catch (e) {
       console.error("[jev]", e);
@@ -71,10 +71,10 @@ export async function POST(req: NextRequest) {
   // Text answer (or text + image): run Jev and Gemini in parallel
   const [jevResult, geminiResult] = await Promise.allSettled([
     jevAvailable()
-      ? evaluateWithJev(question, text)
+      ? evaluateWithJev(question, text, timeSolveSec)
       : Promise.resolve(fallback(question.maxScore, "No Jev API key configured")),
     geminiAvailable()
-      ? evaluateWithGemini(question, text, answerImage)
+      ? evaluateWithGemini(question, text, answerImage, timeSolveSec)
       : Promise.resolve(fallback(question.maxScore, "No Gemini API key configured")),
   ]);
 

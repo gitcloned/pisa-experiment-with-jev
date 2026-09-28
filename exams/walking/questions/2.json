@@ -2,6 +2,7 @@
   "id": 2,
   "stem": "Bernard knows his pacelength is 0.80 metres. The formula applies to Bernard's walking. Calculate Bernard's walking speed in metres per minute and in kilometres per hour. Show your work.",
   "correctAnswer": "89.6 metres per minute and 5.38 km/hr (rounding acceptable: 90 m/min and 5.3–5.4 km/hr)",
+  "avg_time_to_solve_sec": 90,
   "steps": [
     "n = 140 × P = 140 × 0.80 = 112 steps per minute",
     "Speed = n × P = 112 × 0.80 = 89.6 metres per minute",

@@ -22,7 +22,8 @@ export function jevAvailable(): boolean {
 
 export async function evaluateWithJev(
   question: Question,
-  answerText: string
+  answerText: string,
+  timeSolveSec?: number
 ): Promise<EvalResult> {
   const started = performance.now();
 
@@ -49,6 +50,8 @@ export async function evaluateWithJev(
     question: question.stem,
     correctAnswer: question.correctAnswer,
     studentAnswer: answerText,
+    time_to_solve_sec: timeSolveSec ?? null,
+    avg_time_to_solve_sec: question.avg_time_to_solve_sec,
   };
 
   const res = await getClient().systemOne({ state, questions });

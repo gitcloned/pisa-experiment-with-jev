@@ -19,7 +19,8 @@ export function geminiAvailable(): boolean {
 export async function evaluateWithGemini(
   question: Question,
   answerText: string,
-  imageBase64?: string
+  imageBase64?: string,
+  timeSolveSec?: number
 ): Promise<EvalResult> {
   const started = performance.now();
   const model = getGenai().getGenerativeModel({ model: "gemini-3.8-flash" });
@@ -42,6 +43,7 @@ Rating levels: ${ratingOptions}
 ${question.rating.map((r) => `  ${r.level}: ${r.description}`).join("\n")}
 
 Student's answer: ${answerText || "(see image)"}
+Time taken: ${timeSolveSec != null ? `${timeSolveSec}s` : "unknown"} (avg for this question: ${question.avg_time_to_solve_sec}s)
 
 Respond with ONLY valid JSON, no markdown:
 {
