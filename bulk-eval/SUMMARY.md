@@ -8,12 +8,13 @@
 
 ## Results at a glance
 
-| Exp | Jev strategy        | Gemini strategy   | Jev MAE | Gemini MAE |
-|-----|---------------------|-------------------|---------|------------|
-| 01  | 3 generic noul items | Simple prompt    | 1.10    | 1.00       |
-| 02  | Question-specific rubric | Rubric prompt | 1.03    | 1.83       |
-| 03  | Question-specific rubric | Few-shot (3 examples) | 1.03 | 0.50  |
+| Exp | Jev / CLM strategy  | Gemini strategy   | Jev/CLM MAE | Gemini MAE |
+|-----|---------------------|-------------------|-------------|------------|
+| 01  | 3 generic noul items | Simple prompt    | 1.10        | 1.00       |
+| 02  | Question-specific rubric | Rubric prompt | 1.03       | 1.83       |
+| 03  | Question-specific rubric | Few-shot (3 examples) | 1.03  | 0.50       |
 | 04  | Split noul (coarse + precision) | Few-shot | **0.77** | **0.60** |
+| 05  | CLM local (Qwen3-8B + heads) | Few-shot | 1.47     | 0.57       |
 
 ---
 
@@ -82,6 +83,58 @@ Example for Q4.2 (null terminator):
 
 ---
 
+### Exp-05 — CLM (local, Qwen3-8B) as Jev replacement
+
+**What CLM is:** Contrastive Language Models — an open-source System One engine that mirrors Jev's noul/choice/score API. It runs fully locally: a small trained "head pair" (state head + action head) sits on top of any base LLM's embeddings and scores state–question pairs contrastively.
+
+**How it was set up:**
+
+1. **Embedding server** — llama.cpp serving Qwen3-8B-Q4_K_M.gguf in embedding mode:
+   ```
+   llama-server --model ~/.cache/gguf/Qwen3-8B-Q4_K_M.gguf \
+     --port 8090 --embeddings --pooling last --n-gpu-layers 99
+   ```
+
+2. **CLM server** — thin FastAPI layer that loads the pretrained heads and calls the embedding server:
+   ```
+   clm-serve --port 8700 \
+     --emb-url http://127.0.0.1:8090/v1/embeddings \
+     --ckpt ~/.cache/clm/CLM_v0.1-8B.pt \
+     --device cpu --no-ui
+   ```
+
+3. **Client** — drop-in replacement for the Jev SDK:
+   ```python
+   from clm import CLMClient, Noul, Choice
+   client = CLMClient(base_url="http://127.0.0.1:8700")
+   r = client.system_one(state, {"ok": Noul(instructions="...")})
+   r.answers["ok"].noul  # 0.0–1.0
+   ```
+
+**Downloads required:**
+- CLM heads (~75 MB): `hf download Contrastive-LM/CLM-v0.1-8B CLM_v0.1-8B.pt --local-dir ~/.cache/clm/`
+- Qwen3-8B GGUF (~4.7 GB): `hf download Qwen/Qwen3-8B-GGUF Qwen3-8B-Q4_K_M.gguf --local-dir ~/.cache/gguf/`
+
+**Strategy:** Same split noul items as exp-04. CLM API is wire-compatible with Jev — the only change was swapping `TypeSafeClient` for `CLMClient`.
+
+**CLM MAE: 1.47** — worse than Jev's baseline (1.10) and well behind Jev's best (0.77).
+
+**Gemini MAE: 0.57** — consistent with exp-03/04, confirming few-shot calibration is robust.
+
+**Why CLM underperformed:**
+- CLM v0.1 heads are trained on general contrastive/ranking tasks, not grading-specific noul calibration
+- Noul probabilities clustered near 0.5 for most responses — the model was indecisive, so weighted scores collapsed to ~2.0–2.5 regardless of actual answer quality
+- Q4.2: human scores ranged 2.5–5.0 but CLM assigned 2.5 to all five — no discrimination at all
+- Speed: 7.8s avg per call on CPU (embedding server round-trips dominate); much slower than Jev's 350ms
+
+**Learnt:**
+- CLM v0.1 is not calibrated for short-answer grading out of the box
+- The noul head needs task-specific fine-tuning to be competitive with a purpose-built API like Jev
+- The local setup works and the API is compatible — fine-tuning CLM heads on grading data is a plausible path
+- For production use today: Jev (speed + accuracy) or Gemini (accuracy) are both better choices
+
+---
+
 ## Key takeaways
 
 **What works for Jev:**
@@ -94,12 +147,14 @@ Example for Q4.2 (null terminator):
 2. No explicit rubric — let it use holistic judgement
 3. Simple prompt structure; complexity hurts it
 
-**Speed and cost remain Jev's advantage:**
+**Speed and cost:**
 - Jev: ~350ms avg, ~$0.000013 per response
 - Gemini: ~2,800ms avg, ~$0.0004 per response
-- Jev is ~8× faster and ~30× cheaper
+- CLM local: ~7,800ms avg, $0 (fully local, but slow on CPU; embedding server is the bottleneck)
+- Jev is ~8× faster than Gemini and ~30× cheaper; CLM is ~22× slower than Jev on CPU
 
 **Open questions:**
 - Would more few-shot examples (5–10) further improve Gemini?
 - Can Jev reach Gemini's accuracy with an ensemble of coarse+precision items across more rubric dimensions?
 - Does the pattern hold on math questions (vs CS questions used here)?
+- Can CLM heads be fine-tuned on grading-labelled data to match Jev's accuracy while staying fully local?
