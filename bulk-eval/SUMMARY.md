@@ -8,13 +8,14 @@
 
 ## Results at a glance
 
-| Exp | Jev / CLM strategy  | Gemini strategy   | Jev/CLM MAE | Gemini MAE |
-|-----|---------------------|-------------------|-------------|------------|
-| 01  | 3 generic noul items | Simple prompt    | 1.10        | 1.00       |
-| 02  | Question-specific rubric | Rubric prompt | 1.03       | 1.83       |
-| 03  | Question-specific rubric | Few-shot (3 examples) | 1.03  | 0.50       |
-| 04  | Split noul (coarse + precision) | Few-shot | **0.77** | **0.60** |
-| 05  | CLM local (Qwen3-8B + heads) | Few-shot | 1.47     | 0.57       |
+| Exp | Jev MAE | CLM MAE | Decisions MAE | Gemini MAE | Strategy |
+|-----|---------|---------|---------------|------------|----------|
+| 01  | 1.10    | -       | -             | 1.00       | Jev: 3 generic noul items / Gemini: simple prompt |
+| 02  | 1.03    | -       | -             | 1.83       | Jev: question-specific rubric / Gemini: rubric prompt |
+| 03  | 1.03    | -       | -             | 0.50       | Jev: question-specific rubric / Gemini: few-shot |
+| 04  | **0.77**| -       | -             | **0.60**   | Jev: split noul (coarse + precision) / Gemini: few-shot |
+| 05  | -       | 1.47    | -             | 0.57       | CLM: split noul (local Qwen3-8B) / Gemini: few-shot |
+| 06  | -       | -       | **0.50**      | 0.53       | Decisions: split noul (gpt-6-luna) / Gemini: few-shot |
 
 ---
 
@@ -135,6 +136,40 @@ Example for Q4.2 (null terminator):
 
 ---
 
+### Exp-06 — OpenAI Decisions (gpt-6-luna)
+
+**What OpenAI Decisions is:** OpenAI's typed evaluation endpoint — a direct parallel to Jev's System One API. Uses `predicate` (= noul), `choice`, and `score` question types against a shared `input` string. Model: `gpt-6-luna`. Endpoint: `POST /v1/decisions`.
+
+**Strategy:** Same split noul items as exp-04. The `input` field contains question + reference answer + student answer as plain text. Each rubric item becomes a `predicate` question. Probabilities are weighted and scaled to 0–5 exactly as with Jev.
+
+**Decisions MAE: 0.50** — matches Gemini's best and beats Jev's best (0.77) by a significant margin.
+
+**Gemini MAE: 0.53** — consistent with prior few-shot results.
+
+**Speed and cost (15 responses):**
+
+| Model | Total cost | Per response | Avg latency |
+|-------|-----------|--------------|-------------|
+| Jev (exp-04) | ~$0.000195 | ~$0.000013 | ~350ms |
+| Gemini 3.8 Flash | $0.000747 | ~$0.000050 | ~5,128ms |
+| OpenAI Decisions | $0.001336 | ~$0.000089 | ~697ms |
+
+**At scale (1,000 responses):**
+
+| Model | Estimated cost | MAE |
+|-------|---------------|-----|
+| Jev | ~$0.013 | 0.77 |
+| Gemini 3.8 Flash | ~$0.050 | 0.53 |
+| OpenAI Decisions | ~$0.089 | 0.50 |
+
+**Learnt:**
+- OpenAI Decisions achieves Gemini-level accuracy (MAE 0.50) while being 7× faster than Gemini
+- The split rubric approach transfers well — structured noul items work with Decisions just as they did with Jev
+- Decisions costs ~7× more than Jev per response but delivers significantly better accuracy (0.50 vs 0.77)
+- For real-time grading, Decisions is the best option (fast + accurate); for bulk offline eval, Jev is best value
+
+---
+
 ## Key takeaways
 
 **What works for Jev:**
@@ -147,14 +182,21 @@ Example for Q4.2 (null terminator):
 2. No explicit rubric — let it use holistic judgement
 3. Simple prompt structure; complexity hurts it
 
-**Speed and cost:**
-- Jev: ~350ms avg, ~$0.000013 per response
-- Gemini: ~2,800ms avg, ~$0.0004 per response
-- CLM local: ~7,800ms avg, $0 (fully local, but slow on CPU; embedding server is the bottleneck)
-- Jev is ~8× faster than Gemini and ~30× cheaper; CLM is ~22× slower than Jev on CPU
+**Speed and cost summary (per response):**
+
+| Model | Latency | Cost | Best MAE |
+|-------|---------|------|----------|
+| Jev | ~350ms | ~$0.000013 | 0.77 |
+| OpenAI Decisions | ~700ms | ~$0.000089 | **0.50** |
+| Gemini 3.8 Flash | ~5,000ms | ~$0.000050 | 0.50 |
+| CLM local (CPU) | ~7,800ms | $0.00 | 1.47 |
+
+- For **real-time grading**: OpenAI Decisions — best accuracy, fast, reasonable cost
+- For **bulk offline eval**: Jev — cheapest by far, still solid at 0.77
+- For **fully local / zero API cost**: CLM — works but needs fine-tuning on grading data to be competitive
 
 **Open questions:**
-- Would more few-shot examples (5–10) further improve Gemini?
-- Can Jev reach Gemini's accuracy with an ensemble of coarse+precision items across more rubric dimensions?
+- Would more few-shot examples (5–10) further improve Gemini or Decisions?
+- Can Jev reach 0.50 MAE with more rubric dimensions per question?
 - Does the pattern hold on math questions (vs CS questions used here)?
 - Can CLM heads be fine-tuned on grading-labelled data to match Jev's accuracy while staying fully local?
