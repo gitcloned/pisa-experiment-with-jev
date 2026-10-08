@@ -8,14 +8,20 @@
 
 ## Results at a glance
 
-| Exp | Jev MAE | CLM MAE | Decisions MAE | Gemini MAE | Strategy |
-|-----|---------|---------|---------------|------------|----------|
-| 01  | 1.10    | -       | -             | 1.00       | Jev: 3 generic noul items / Gemini: simple prompt |
-| 02  | 1.03    | -       | -             | 1.83       | Jev: question-specific rubric / Gemini: rubric prompt |
-| 03  | 1.03    | -       | -             | 0.50       | Jev: question-specific rubric / Gemini: few-shot |
-| 04  | **0.77**| -       | -             | **0.60**   | Jev: split noul (coarse + precision) / Gemini: few-shot |
-| 05  | -       | 1.47    | -             | 0.57       | CLM: split noul (local Qwen3-8B) / Gemini: few-shot |
-| 06  | -       | -       | **0.50**      | 0.53       | Decisions: split noul (gpt-6-luna) / Gemini: few-shot |
+| Exp | Model             | MAE      | Latency  | Cost / response | Remark                              |
+|-----|-------------------|----------|----------|-----------------|-------------------------------------|
+| 01  | Jev               | 1.10     | 391ms    | $0.000013       | 3 generic noul items                |
+| 01  | Gemini            | 1.00     | 2,312ms  | $0.000300       | Simple prompt                       |
+| 02  | Jev               | 1.03     | 342ms    | $0.000013       | Question-specific rubric            |
+| 02  | Gemini            | 1.83     | 3,226ms  | $0.000380       | Rubric prompt — hurt Gemini         |
+| 03  | Jev               | 1.03     | 324ms    | $0.000013       | Question-specific rubric (unchanged)|
+| 03  | Gemini            | 0.50     | 2,939ms  | $0.000407       | Few-shot (3 examples)               |
+| 04  | Jev               | **0.77** | 366ms    | $0.000016       | Split noul (coarse + precision)     |
+| 04  | Gemini            | **0.60** | 2,809ms  | $0.000402       | Few-shot (unchanged)                |
+| 05  | CLM (local)       | 1.47     | 7,834ms  | $0.00           | Split noul, Qwen3-8B local — uncalibrated |
+| 05  | Gemini            | 0.57     | 4,915ms  | ~$0.000050      | Few-shot (unchanged)                |
+| 06  | OpenAI Decisions  | **0.50** | 697ms    | $0.000089       | Split noul, gpt-6-luna              |
+| 06  | Gemini            | 0.53     | 5,128ms  | $0.000050       | Few-shot (unchanged)                |
 
 ---
 
@@ -182,18 +188,11 @@ Example for Q4.2 (null terminator):
 2. No explicit rubric — let it use holistic judgement
 3. Simple prompt structure; complexity hurts it
 
-**Speed and cost summary (per response):**
+**Speed, cost, and accuracy summary (see results table for per-experiment breakdown):**
 
-| Model | Latency | Cost | Best MAE |
-|-------|---------|------|----------|
-| Jev | ~350ms | ~$0.000013 | 0.77 |
-| OpenAI Decisions | ~700ms | ~$0.000089 | **0.50** |
-| Gemini 3.8 Flash | ~5,000ms | ~$0.000050 | 0.50 |
-| CLM local (CPU) | ~7,800ms | $0.00 | 1.47 |
-
-- For **real-time grading**: OpenAI Decisions — best accuracy, fast, reasonable cost
-- For **bulk offline eval**: Jev — cheapest by far, still solid at 0.77
-- For **fully local / zero API cost**: CLM — works but needs fine-tuning on grading data to be competitive
+- For **real-time grading**: OpenAI Decisions — best accuracy (MAE 0.50), fast (697ms), reasonable cost ($0.000089/resp)
+- For **bulk offline eval**: Jev — cheapest ($0.000013/resp, ~7× less than Decisions), fast (350ms), MAE 0.77
+- For **fully local / zero API cost**: CLM — works but needs grading-specific fine-tuning to be competitive
 
 **Open questions:**
 - Would more few-shot examples (5–10) further improve Gemini or Decisions?
