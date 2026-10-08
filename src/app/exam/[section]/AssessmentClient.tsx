@@ -27,6 +27,7 @@ export default function AssessmentClient({ section, questions }: Props) {
   const [resultsModalOpen, setResultsModalOpen] = useState(false);
   const [results, setResults] = useState<EvaluationResponse | null>(null);
   const [loading, setLoading] = useState(false);
+  const [evalError, setEvalError] = useState<string | null>(null);
   const [stimulusOpen, setStimulusOpen] = useState(false);
   const [completedResults, setCompletedResults] = useState<CompletedResult[]>([]);
   const questionStartRef = useRef<number>(Date.now());
@@ -41,6 +42,7 @@ export default function AssessmentClient({ section, questions }: Props) {
   async function handleSubmit(answerText: string, answerImage?: string) {
     const timeSolveSec = Math.round((Date.now() - questionStartRef.current) / 1000);
     setLoading(true);
+    setEvalError(null);
     setAnswerModalOpen(false);
     try {
       const res = await fetch("/api/evaluate", {
@@ -54,10 +56,16 @@ export default function AssessmentClient({ section, questions }: Props) {
           timeSolveSec,
         }),
       });
+      if (!res.ok) {
+        const body = await res.text().catch(() => "");
+        throw new Error(`Server error ${res.status}${body ? ": " + body.slice(0, 200) : ""}`);
+      }
       const data: EvaluationResponse = await res.json();
       setResults(data);
       setCompletedResults((prev) => [...prev, { question, eval: data }]);
       setResultsModalOpen(true);
+    } catch (err) {
+      setEvalError(err instanceof Error ? err.message : "Evaluation failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -213,12 +221,15 @@ export default function AssessmentClient({ section, questions }: Props) {
               </p>
             </div>
             <div className="shrink-0 p-4 bg-white border-t border-gray-100">
+              {evalError && (
+                <p className="text-xs text-red-500 text-center mb-2 px-1">{evalError}</p>
+              )}
               <button
                 onClick={() => setAnswerModalOpen(true)}
                 disabled={loading}
                 className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white rounded-xl py-3.5 font-semibold text-base transition-colors"
               >
-                {loading ? "Evaluating…" : "Answer"}
+                {loading ? "Evaluating…" : evalError ? "Try Again" : "Answer"}
               </button>
             </div>
           </>

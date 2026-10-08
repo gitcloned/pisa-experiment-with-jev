@@ -118,7 +118,7 @@ export async function ocrImageWithGemini(
   imageBase64: string
 ): Promise<{ text: string; cost: CostBreakdown; latencyMs: number }> {
   const started = performance.now();
-  const model = getGenai().getGenerativeModel({ model: "gemini-3.5-flash-lite" });
+  const model = getGenai().getGenerativeModel({ model: "gemini-3.8-flash-lite" });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const parts: any[] = [
