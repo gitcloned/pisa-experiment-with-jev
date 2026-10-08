@@ -1,5 +1,34 @@
 # Bulk Eval — Experiment Summary
 
+## Objective
+
+Can Jev be used for rubric-based assessment of student answers — and how does it compare to conventional LLMs on accuracy, speed, and cost?
+
+Every exam question has an answer key and a rubric. The core questions this experiment investigates:
+
+1. Can Jev score more accurately than conventional LLM models?
+2. What is the speed difference end-to-end (text-only and image-based questions)?
+3. What is the cost difference at scale?
+4. How do you translate a rubric into language Jev understands (noul items)?
+
+## The Site
+
+**Live demo:** [pisa-experiment-with-jev.vercel.app](https://pisa-experiment-with-jev.vercel.app)
+
+The site is a PISA-style exam interface where a student works through real PISA math questions across four sections — **Apples**, **Growing Up**, **Speed of a Racing Car**, and **Walking**. Questions include images; students type or upload their answers.
+
+On submission, each answer is graded **simultaneously** by Jev and Gemini. The UI shows:
+- Score from each model (on the question's rubric scale)
+- Per-model latency and cost breakdown
+- A speed timeline bar split by OCR time (when an image is uploaded) and eval time
+- An end screen with total scores and per-question breakdown across both models
+
+The site is the **qualitative** half of this experiment — real students, real questions. The bulk eval below is the **quantitative** half — a labelled dataset with known human scores, used to measure MAE objectively.
+
+---
+
+## Dataset and method
+
 **Dataset:** Mohler short-answer grading dataset (CS questions, 2,442 responses, human scores 0–5)
 **Test set:** 3 questions × 5 responses = 15 responses per experiment
 **Metric:** MAE (Mean Absolute Error) vs human score, out of 5. Lower = better.
