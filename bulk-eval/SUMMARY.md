@@ -1,4 +1,4 @@
-# Bulk Eval — Experiment Summary
+# Bulk Eval with Jev and other models
 
 ## Objective
 
@@ -15,7 +15,7 @@ Every exam question has an answer key and a rubric. The core questions this expe
 
 **Live demo:** [pisa-experiment-with-jev.vercel.app](https://pisa-experiment-with-jev.vercel.app)
 
-The site is a PISA-style exam interface where a student works through real PISA math questions across four sections — **Apples**, **Growing Up**, **Speed of a Racing Car**, and **Walking**. Questions include images; students type or upload their answers.
+The curiosity was to look at PISA questions, and also use Jev and compare things visually
 
 On submission, each answer is graded **simultaneously** by Jev and Gemini. The UI shows:
 - Score from each model (on the question's rubric scale)
